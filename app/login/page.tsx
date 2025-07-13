@@ -1,27 +1,70 @@
 // app/login/page.tsx  ―  Google ログイン（モック）
 "use client";
 
-import { useState } from "react";
+import { auth } from "../../lib/firebase";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
-export default function Login() {
-  const [loading, setLoading] = useState(false);
+export default function GoogleLoginButton() {
+  const router = useRouter();
 
-  const handleGoogleLogin = () => {
-    setLoading(true);
-    // TODO: Firebase Auth / next-auth などへ差し替え
-    setTimeout(() => alert("モック：Google OAuth 成功"), 800);
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
+      if (currentUser) {
+        const idTokenResult = await currentUser.getIdTokenResult();
+        const role = idTokenResult.claims.role;
+        
+        // ロールに応じてリダイレクト
+        if (role === "admin") {
+          console.log("adminとしてリダイレクト");
+          router.push("/admin"); // 既存のadminダッシュボード
+        } else if (role === "owner") {
+          console.log("company ownerとしてリダイレクト");
+          router.push("/company"); // companyダッシュボード
+        } else {
+          console.log("一般ユーザーとしてリダイレクト");
+          router.push("/"); // または適切なページ
+        }
+      } else {
+        router.push("/login");
+      }
+    });
+
+    return () => unsubscribe();
+  }, [router]);
+
+  const handleLogin = async () => {
+    const provider = new GoogleAuthProvider();
+    
+    // ポップアップの設定
+    provider.setCustomParameters({
+      prompt: 'select_account'
+    });
+    
+    try {
+      console.log("ログイン開始");
+      const result = await signInWithPopup(auth, provider);
+      console.log("ログイン成功:", result.user.displayName);
+      console.log("ユーザーID:", result.user.uid);
+      alert(`ログイン成功: ${result.user.displayName}`);
+    } catch (e) {
+      console.error("ログインエラー:", e);
+      
+      // ポップアップブロッカーの場合の処理
+      if (e.code === 'auth/popup-blocked') {
+        alert("ポップアップがブロックされました。ポップアップを許可してください。");
+      } else {
+        alert("ログインに失敗しました");
+      }
+    }
   };
 
   return (
-    <main className="flex flex-col items-center justify-center min-h-[60vh] p-6">
-      <h1 className="text-2xl font-bold mb-8">Google でログイン</h1>
-      <button
-        onClick={handleGoogleLogin}
-        disabled={loading}
-        className="flex items-center gap-2 rounded bg-white border px-6 py-3 shadow hover:bg-gray-50"
-      >
-        <img src="/google.svg" alt="" className="w-5 h-5" />
-        <span>{loading ? "認証中…" : "Sign in with Google"}</span>
+    <main className="flex flex-col items-center justify-center min-h-screen">
+      <p className="text-xl font-semibold mb-4">ログインして始めましょう</p>
+      <button onClick={handleLogin} className="btn-primary text-2xl font-bold mb-8">
+        Sign in with Google
       </button>
     </main>
   );

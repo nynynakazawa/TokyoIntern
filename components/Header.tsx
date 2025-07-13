@@ -2,10 +2,47 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { auth } from "../lib/firebase";
+import { signOut } from "firebase/auth";
 
 export default function Header() {
   const [open, setOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+      setUser(currentUser);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      console.log("ログアウト成功");
+    } catch (error) {
+      console.error("ログアウトエラー:", error);
+    }
+  };
+
+  if (loading) {
+    return (
+      <header className="sticky top-0 z-50 bg-white border-b border-gray-100">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 relative">
+          <Link href="/" className="flex items-center gap-2 font-bold text-main-600 text-xl">
+            <svg viewBox="0 0 24 24" className="h-7 w-7 fill-current">
+              <circle cx="12" cy="12" r="10" />
+            </svg>
+            トウキョウインターン
+          </Link>
+        </div>
+      </header>
+    );
+  }
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-100">
@@ -27,8 +64,18 @@ export default function Header() {
 
         {/* 右側ボタン */}
         <div className="hidden items-center gap-3 md:flex text-lg">
-          <Link href="/login" className="btn-outline">ログイン</Link>
-          <Link href="/register" className="btn-primary">会員登録</Link>
+          {user ? (
+            <>
+              <button onClick={handleLogout} className="btn-outline">ログアウト</button>
+              <Link href="/mypage" className="btn-primary">マイページ</Link>
+
+            </>
+          ) : (
+            <>
+              <Link href="/login" className="btn-outline">ログイン</Link>
+              <Link href="/register" className="btn-primary">会員登録</Link>
+            </>
+          )}
         </div>
 
         {/* SPハンバーガー */}
@@ -63,6 +110,17 @@ export default function Header() {
             <Link href="/jobs" onClick={() => setOpen(false)}>求人検索</Link>
             <Link href="/about" onClick={() => setOpen(false)}>会社概要</Link>
             <Link href="/contact" onClick={() => setOpen(false)}>お問い合わせ</Link>
+            {user ? (
+              <>
+                <Link href="/mypage" onClick={() => setOpen(false)}>マイページ</Link>
+                <button onClick={handleLogout} className="text-left">ログアウト</button>
+              </>
+            ) : (
+              <>
+                <Link href="/login" onClick={() => setOpen(false)}>ログイン</Link>
+                <Link href="/register" onClick={() => setOpen(false)}>会員登録</Link>
+              </>
+            )}
           </nav>
         </div>
       </div>

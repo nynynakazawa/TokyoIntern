@@ -1,9 +1,8 @@
-// app/page.tsx  ―  トップページ “/”
+// app/page.tsx
 import Link from "next/link";
-import JobCard from "../components/JobCard";
-import { mockJobs } from "../lib/mock-data";
+import JobList from "../src/JobList";
 
-export const dynamic = "force-static"; // 100% 静的ビルド (モック)
+export const dynamic = "force-static"; // 必要なら残す
 
 export default function Home() {
   return (
@@ -26,10 +25,8 @@ export default function Home() {
       </Link>
 
       {/* --- 求人カード --- */}
-      <div className="mt-10 w-full grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {mockJobs.map((job) => (
-          <JobCard key={job.id} job={job} />
-        ))}
+      <div className="mt-10 w-full">
+        <JobList limit={3} />
       </div>
     </main>
   );

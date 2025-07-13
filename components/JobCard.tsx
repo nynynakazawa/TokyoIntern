@@ -1,15 +1,5 @@
 import Link from "next/link";
-
-/** モック用 Job 型 */
-export interface Job {
-  id: string;
-  title: string;
-  area: string;
-  occupation: string;
-  wage: string;
-  thumbnail?: string;
-  company: { id: string; name: string; logo?: string };
-}
+import { Job } from "@/hook/useJobs";
 
 export default function JobCard({ job }: { job: Job }) {
   return (
@@ -28,25 +18,28 @@ export default function JobCard({ job }: { job: Job }) {
 
       {/* 本文 */}
       <div className="flex flex-1 flex-col p-3">
+        {/* area, occupationはFirestoreに無ければ省略 */}
         <ul className="mb-2 flex flex-wrap gap-1">
-          <li className="badge">{job.area}</li>
-          <li className="badge">{job.occupation}</li>
+          {job.area && <li className="badge">{job.area}</li>}
+          {job.occupation && <li className="badge">{job.occupation}</li>}
         </ul>
 
         <h3 className="mb-2 line-clamp-2 font-semibold group-hover:text-main-600">
           {job.title}
         </h3>
 
-        <p className="mb-4 text-sm text-gray-500">時給 ¥{job.wage.toLocaleString()}</p>
+        <p className="mb-4 text-sm text-gray-500">時給 ¥{job.wage?.toLocaleString?.() ?? job.wage}</p>
 
-        {/* 会社 */}
+        {/* 会社名（companyNameやcompanyIdがあれば表示） */}
         <div className="mt-auto flex items-center gap-2 pt-2">
-          <img
-            src={job.company.logo ?? "/logo.svg"}
-            alt=""
-            className="h-8 w-8 rounded-full border"
-          />
-          <p className="truncate text-xs">{job.company.name}</p>
+          {job.companyLogo && (
+            <img
+              src={job.companyLogo}
+              alt=""
+              className="h-8 w-8 rounded-full border"
+            />
+          )}
+          <p className="truncate text-xs">{job.companyName ?? ""}</p>
         </div>
       </div>
     </Link>
