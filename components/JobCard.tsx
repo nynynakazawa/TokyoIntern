@@ -28,7 +28,12 @@ export default function JobCard({ job }: { job: Job }) {
           {job.title}
         </h3>
 
-        <p className="mb-4 text-sm text-gray-500">時給 ¥{job.wage?.toLocaleString?.() ?? job.wage}</p>
+        <p className="mb-4 text-sm text-gray-500">
+          {job.wageMax ?
+            `時給 ¥${job.wageMin.toLocaleString()}~${job.wageMax.toLocaleString()}` :
+            `時給 ¥${job.wageMin.toLocaleString()}`
+          }
+        </p>
 
         {/* 会社名（companyNameやcompanyIdがあれば表示） */}
         <div className="mt-auto flex items-center gap-2 pt-2">

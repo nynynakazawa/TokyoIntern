@@ -56,7 +56,12 @@ export default function JobListTable() {
           {jobs.map((job) => (
             <TableRow key={job.id}>
               <TableCell>{job.title}</TableCell>
-              <TableCell>{job.wage}</TableCell>
+              <TableCell>
+                {job.wageMax ?
+                  `¥${job.wageMin.toLocaleString()}~${job.wageMax.toLocaleString()}` :
+                  `¥${job.wageMin.toLocaleString()}`
+                }
+              </TableCell>
               <TableCell>{job.createdAt ? new Date(job.createdAt).toLocaleDateString() : ""}</TableCell>
               <TableCell>
                 <Link href={`/company/jobs/${job.id}/edit`}>

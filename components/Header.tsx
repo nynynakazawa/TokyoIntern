@@ -5,18 +5,28 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { auth } from "../lib/firebase";
 import { signOut } from "firebase/auth";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const router = useRouter();
+
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+    const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
       setUser(currentUser);
       setLoading(false);
+      if (currentUser) {
+        const token = await currentUser.getIdTokenResult();
+        setRole(typeof token.claims.role === "string" ? token.claims.role : null);
+      } else {
+        setRole(null);
+      }
     });
-
     return () => unsubscribe();
   }, []);
 
@@ -27,6 +37,40 @@ export default function Header() {
     } catch (error) {
       console.error("ログアウトエラー:", error);
     }
+  };
+
+  const handleLogin = async () => {
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: "select_account" });
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      const idTokenResult = await user.getIdTokenResult();
+      const role = idTokenResult.claims.role;
+      if (role === "admin") {
+        router.push("/admin");
+      } else if (role === "owner" || role === "company") {
+        router.push("/company");
+      } else {
+        router.push("/");
+      }
+    } catch (e) {
+      alert("ログインに失敗しました");
+      console.error(e);
+    }
+  };
+
+  // 管理者ページのリンク先を決定
+  const getAdminPageLink = () => {
+    if (role === "admin") return "/admin";
+    if (role === "owner" || role === "company") return "/company";
+    return "/mypage";
+  };
+
+  // 管理者ページのボタン名
+  const getAdminPageLabel = () => {
+    if (role === "admin" || role === "owner" || role === "company") return "管理者ページ";
+    return "マイページ";
   };
 
   if (loading) {
@@ -67,12 +111,11 @@ export default function Header() {
           {user ? (
             <>
               <button onClick={handleLogout} className="btn-outline">ログアウト</button>
-              <Link href="/mypage" className="btn-primary">マイページ</Link>
-
+              <Link href={getAdminPageLink()} className="btn-primary">{getAdminPageLabel()}</Link>
             </>
           ) : (
             <>
-              <Link href="/login" className="btn-outline">ログイン</Link>
+              <button onClick={handleLogin} className="btn-outline">ログイン</button>
               <Link href="/register" className="btn-primary">会員登録</Link>
             </>
           )}
@@ -112,7 +155,7 @@ export default function Header() {
             <Link href="/contact" onClick={() => setOpen(false)}>お問い合わせ</Link>
             {user ? (
               <>
-                <Link href="/mypage" onClick={() => setOpen(false)}>マイページ</Link>
+                <Link href={getAdminPageLink()} onClick={() => setOpen(false)}>{getAdminPageLabel()}</Link>
                 <button onClick={handleLogout} className="text-left">ログアウト</button>
               </>
             ) : (

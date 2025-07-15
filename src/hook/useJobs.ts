@@ -9,7 +9,8 @@ export type Job = {
   id: string;
   title: string;
   description: string;
-  wage: string;
+  wageMin: number;
+  wageMax?: number;
   conditions?: string;
   duties?: string;
   notes?: string;
@@ -37,10 +38,15 @@ export function useJobs(companyId?: string) {
     const unsubscribe = onSnapshot(
       jobsQuery,
       (snapshot: QuerySnapshot<DocumentData>) => {
-        const jobsData = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as Job[];
+        const jobsData = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            ...data,
+            wageMin: typeof data.wageMin === "number" ? data.wageMin : Number(data.wageMin),
+            wageMax: data.wageMax !== undefined ? Number(data.wageMax) : undefined,
+          } as Job;
+        });
         setJobs(jobsData);
         setLoading(false);
       }

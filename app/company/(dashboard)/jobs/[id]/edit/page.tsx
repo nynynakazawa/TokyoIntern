@@ -1,67 +1,62 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { auth } from "../../../../../lib/firebaseClient";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
+import app from "../../../../../../lib/firebaseClient";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { jobSchema, JobFormInput } from "../../../../../lib/validation/jobSchema";
-import { createJob } from "../../../../../lib/serverActions/jobActions";
+import { jobSchema, JobFormInput } from "../../../../../../lib/validation/jobSchema";
+import { updateJob } from "../../../../../../lib/serverActions/jobActions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import ImageUpload from "../../../../../components/ImageUpload";
-import { getFirestore, doc, getDoc } from "firebase/firestore";
-import app from "../../../../../lib/firebaseClient";
+import ImageUpload from "../../../../../../components/ImageUpload";
 
-function JobCreateForm({ companyId }: { companyId: string }) {
+export default function JobEditPage() {
   const router = useRouter();
+  const { id } = useParams();
+  const [loading, setLoading] = useState(true);
   const [thumbnailUrl, setThumbnailUrl] = useState("");
 
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<JobFormInput>({
     resolver: zodResolver(jobSchema),
-    defaultValues: {
-      companyId,
-      thumbnail: "",
-      area: "",
-      occupation: "",
-      companyLogo: "",
-      companyName: "",
-    },
   });
 
-  const onSubmit = async (data: JobFormInput) => {
-    const db = getFirestore(app);
-    const companyRef = doc(db, "companies", companyId);
-    const companySnap = await getDoc(companyRef);
-    let companyName = "";
-    let companyLogo = "";
-    if (companySnap.exists()) {
-      const companyData = companySnap.data();
-      companyName = companyData.name || "";
-      companyLogo = companyData.iconUrl || "";
-    }
-    const jobData = {
-      ...data,
-      companyId,
-      companyName,
-      companyLogo,
-      thumbnail: thumbnailUrl,
-      createdAt: new Date().toISOString(),
+  useEffect(() => {
+    const fetchJob = async () => {
+      if (!id) return;
+      const db = getFirestore(app);
+      const ref = doc(db, "jobs", id as string);
+      const snap = await getDoc(ref);
+      if (snap.exists()) {
+        const data = snap.data();
+        Object.entries(data).forEach(([key, value]) => {
+          setValue(key as keyof JobFormInput, value);
+        });
+        setThumbnailUrl(data.thumbnail || "");
+      }
+      setLoading(false);
     };
-    await createJob(jobData);
+    fetchJob();
+  }, [id, setValue]);
+
+  const onSubmit = async (data: JobFormInput) => {
+    await updateJob(id as string, { ...data, thumbnail: thumbnailUrl });
     router.push("/company/jobs");
   };
 
+  if (loading) return <div>読み込み中...</div>;
+
   return (
     <div className="max-w-2xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6">新規求人作成</h1>
+      <h1 className="text-2xl font-bold mb-6">求人編集</h1>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <input type="hidden" {...register("companyId")} value={companyId} />
         <div>
           <label className="block font-bold mb-1">タイトル<span className="text-red-500">*</span></label>
           <Input {...register("title")} />
@@ -104,7 +99,7 @@ function JobCreateForm({ companyId }: { companyId: string }) {
           <label className="block font-bold mb-1">備考</label>
           <Textarea {...register("notes")} rows={3} placeholder="その他の情報があれば記載してください" />
         </div>
-        <ImageUpload onImageUpload={setThumbnailUrl} />
+        <ImageUpload onImageUpload={setThumbnailUrl} currentImageUrl={thumbnailUrl} />
         <div className="flex justify-end space-x-4">
           <Button
             type="button"
@@ -114,29 +109,10 @@ function JobCreateForm({ companyId }: { companyId: string }) {
             キャンセル
           </Button>
           <button type="submit" disabled={isSubmitting} className="btn btn-primary">
-            {isSubmitting ? "送信中..." : "登録"}
+            {isSubmitting ? "送信中..." : "更新"}
           </button>
         </div>
       </form>
     </div>
   );
-}
-
-export default function JobCreatePage() {
-  const [companyId, setCompanyId] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchCompanyId = async () => {
-      const user = auth.currentUser;
-      if (user) {
-        const token = await user.getIdTokenResult();
-        setCompanyId(typeof token.claims.companyId === "string" ? token.claims.companyId : null);
-      }
-    };
-    fetchCompanyId();
-  }, []);
-
-  if (!companyId) return <div>企業情報を取得中...</div>;
-
-  return <JobCreateForm companyId={companyId} />;
-}
+} 
