@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import ImageUpload from "../../../../../components/ImageUpload";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
 import app from "../../../../../lib/firebaseClient";
+import AreaFilter from "../../../../../components/Filters/AreaFilter";
 
 function JobCreateForm({ companyId }: { companyId: string }) {
   const router = useRouter();
@@ -22,6 +23,8 @@ function JobCreateForm({ companyId }: { companyId: string }) {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
+    setValue,
+    watch,
   } = useForm<JobFormInput>({
     resolver: zodResolver(jobSchema),
     defaultValues: {
@@ -86,7 +89,11 @@ function JobCreateForm({ companyId }: { companyId: string }) {
         </div>
         <div>
           <label className="block font-bold mb-1">勤務地</label>
-          <Input {...register("area")} placeholder="例: 渋谷区" />
+          <AreaFilter
+            value={watch("area") ?? ""}
+            onChange={(v: string) => setValue("area", v, { shouldValidate: true })}
+          />
+          {errors.area && <p className="text-red-500 text-sm">{errors.area.message}</p>}
         </div>
         <div>
           <label className="block font-bold mb-1">職種</label>

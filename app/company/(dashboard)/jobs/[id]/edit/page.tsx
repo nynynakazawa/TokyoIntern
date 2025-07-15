@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import ImageUpload from "../../../../../../components/ImageUpload";
+import AreaFilter from "../../../../../../components/Filters/AreaFilter";
 
 export default function JobEditPage() {
   const router = useRouter();
@@ -24,6 +25,7 @@ export default function JobEditPage() {
     handleSubmit,
     setValue,
     formState: { errors, isSubmitting },
+    watch,
   } = useForm<JobFormInput>({
     resolver: zodResolver(jobSchema),
   });
@@ -81,7 +83,11 @@ export default function JobEditPage() {
         </div>
         <div>
           <label className="block font-bold mb-1">勤務地</label>
-          <Input {...register("area")} placeholder="例: 渋谷区" />
+          <AreaFilter
+            value={watch("area") ?? ""}
+            onChange={(v: string) => setValue("area", v, { shouldValidate: true })}
+          />
+          {errors.area && <p className="text-red-500 text-sm">{errors.area.message}</p>}
         </div>
         <div>
           <label className="block font-bold mb-1">職種</label>

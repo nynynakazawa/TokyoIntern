@@ -52,7 +52,7 @@ export default function GoogleLoginButton() {
       console.error("ログインエラー:", e);
       
       // ポップアップブロッカーの場合の処理
-      if (e.code === 'auth/popup-blocked') {
+      if (typeof e === "object" && e !== null && "code" in e && (e as any).code === 'auth/popup-blocked') {
         alert("ポップアップがブロックされました。ポップアップを許可してください。");
       } else {
         alert("ログインに失敗しました");

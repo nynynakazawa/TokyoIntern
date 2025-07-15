@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { auth } from "../../../../lib/firebase";
-import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
+import { getFirestore, doc, getDoc, setDoc, collection } from "firebase/firestore";
 import app from "../../../../lib/firebaseClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,12 +24,12 @@ export default function CompanyProfilePage() {
       if (currentUser) {
         setUser(currentUser);
         const token = await currentUser.getIdTokenResult();
-        setCompanyId(token.claims.companyId || "");
-        setRole(token.claims.role || "");
+        setCompanyId(typeof token.claims.companyId === "string" ? token.claims.companyId : "");
+        setRole(typeof token.claims.role === "string" ? token.claims.role : "");
         // Firestoreから企業情報取得
-        if (token.claims.companyId) {
+        if (typeof token.claims.companyId === "string" && token.claims.companyId) {
           const db = getFirestore(app);
-          const ref = doc(db, "companies", token.claims.companyId);
+          const ref = doc(collection(db, "companies"), token.claims.companyId as string);
           const snap = await getDoc(ref);
           if (snap.exists()) {
             const data = snap.data();
@@ -49,7 +49,7 @@ export default function CompanyProfilePage() {
   const handleSave = async () => {
     if (!companyId) return;
     const db = getFirestore(app);
-    const ref = doc(db, "companies", companyId);
+    const ref = doc(collection(db, "companies"), companyId as string);
     await setDoc(ref, {
       name: companyName,
       profile,

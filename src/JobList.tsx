@@ -23,13 +23,20 @@ export default function JobList({
   let filteredJobs = jobs;
   
   if (areaFilter) {
-    filteredJobs = filteredJobs.filter(job => job.area === areaFilter);
+    filteredJobs = filteredJobs.filter(job => job.area && job.area.startsWith(areaFilter));
   }
   if (occupationFilter) {
     filteredJobs = filteredJobs.filter(job => job.occupation === occupationFilter);
   }
   if (wageFilter) {
-    filteredJobs = filteredJobs.filter(job => job.wage === wageFilter);
+    // wageMin/wageMaxの範囲でフィルタリングする
+    const wageFilterNum = Number(wageFilter);
+    filteredJobs = filteredJobs.filter(job => {
+      if (job.wageMax !== undefined && job.wageMax !== null) {
+        return wageFilterNum >= job.wageMin && wageFilterNum <= job.wageMax;
+      }
+      return wageFilterNum === job.wageMin;
+    });
   }
 
   // 件数制限
