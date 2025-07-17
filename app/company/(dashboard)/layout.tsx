@@ -17,6 +17,9 @@ export default function CompanyDashboardLayout({ children }: { children: ReactNo
             <Link href="/company/jobs">自社求人管理</Link>
           </Button>
           <Button asChild variant="ghost" className="justify-start">
+            <Link href="/company/applicants">応募者管理</Link>
+          </Button>
+          <Button asChild variant="ghost" className="justify-start">
             <Link href="/company/profile">企業プロフィール</Link>
           </Button>
         </nav>

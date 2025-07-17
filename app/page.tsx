@@ -8,14 +8,14 @@ export default function Home() {
   return (
     <main className="flex flex-col items-center justify-center min-h-[60vh] max-w-5xl mx-auto p-6 text-center">
       <h1 className="text-3xl font-bold mb-4">
-        TokyoIntern
+        トウキョウインターン
         <br className="block md:hidden" />
-        モックへようこそ
+        へようこそ
       </h1>
       <p className="mb-6">
         学生向けインターンを簡単検索。
         <br className="block md:hidden" />
-        会員登録せずに UI 遷移だけ体験できます。
+        やりたいことが見つかる。
       </p>
       <Link
         href="/jobs"

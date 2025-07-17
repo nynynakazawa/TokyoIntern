@@ -2,10 +2,43 @@
 
 import { useParams } from "next/navigation";
 import { useJobs } from "@/hook/useJobs";
+import { useRouter } from "next/navigation";
+import { auth } from "../../../lib/firebase";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { useState, useEffect } from "react";
 
 export default function JobDetailPage() {
   const params = useParams();
   const { jobs, loading } = useJobs();
+  const router = useRouter();
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const handleApply = async () => {
+    if (!user) {
+      // 未ログイン時はGoogleログイン→応募フォーム遷移
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: "select_account" });
+      try {
+        const result = await signInWithPopup(auth, provider);
+        if (result.user) {
+          router.push(`/jobs/${params.id}/apply`);
+        }
+      } catch (e) {
+        alert("ログインに失敗しました");
+        console.error(e);
+      }
+    } else {
+      // ログイン済みなら直接応募フォームへ
+      router.push(`/jobs/${params.id}/apply`);
+    }
+  };
 
   if (loading) return <div>読み込み中...</div>;
 
@@ -56,6 +89,15 @@ export default function JobDetailPage() {
         <h2 className="text-xl font-bold mb-2">仕事内容</h2>
         <p>{job.description}</p>
       </section>
+      {/* 企業に応募するボタン */}
+      <div className="mt-8 flex justify-center">
+        <button
+          className="btn-primary px-8 py-3 rounded text-lg"
+          onClick={handleApply}
+        >
+          企業に応募する
+        </button>
+      </div>
     </main>
   );
 }

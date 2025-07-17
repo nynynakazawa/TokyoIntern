@@ -31,6 +31,7 @@ export default function Header() {
   }, []);
 
   const handleLogout = async () => {
+    if (!window.confirm("ログアウトしてよろしいですか?")) return;
     try {
       await signOut(auth);
       console.log("ログアウト成功");

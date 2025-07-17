@@ -18,6 +18,7 @@ export default function CompanyProfilePage() {
   const [profile, setProfile] = useState("");
   const [iconUrl, setIconUrl] = useState("");
   const [loading, setLoading] = useState(true);
+  const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
@@ -26,7 +27,6 @@ export default function CompanyProfilePage() {
         const token = await currentUser.getIdTokenResult();
         setCompanyId(typeof token.claims.companyId === "string" ? token.claims.companyId : "");
         setRole(typeof token.claims.role === "string" ? token.claims.role : "");
-        // Firestoreから企業情報取得
         if (typeof token.claims.companyId === "string" && token.claims.companyId) {
           const db = getFirestore(app);
           const ref = doc(collection(db, "companies"), token.claims.companyId as string);
@@ -55,46 +55,39 @@ export default function CompanyProfilePage() {
       profile,
       iconUrl,
     }, { merge: true });
-    alert("保存しました");
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
     router.push("/company");
   };
 
   if (loading) return <div>読み込み中...</div>;
 
   return (
-    <div className="max-w-xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6">企業プロフィール編集</h1>
-      <div className="mb-4">
-        <label className="block font-bold mb-1">ユーザー名</label>
-        <Input value={user?.displayName || ""} disabled />
+    <main className="min-h-[60vh] flex items-center justify-center bg-gray-50 py-8">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
+        <h1 className="text-2xl font-bold mb-8 text-center text-main-700">企業プロフィール編集</h1>
+        {saved && <p className="text-green-600 text-center font-semibold mb-4">保存しました！</p>}
+        <div className="space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">企業名</label>
+            <Input value={companyName} onChange={e => setCompanyName(e.target.value)}
+              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-main-300 focus:border-main-400 transition" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">企業プロフィール</label>
+            <textarea className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-main-300 focus:border-main-400 transition resize-none"
+              rows={4} value={profile} onChange={e => setProfile(e.target.value)} />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">企業アイコン</label>
+            <ImageUpload onImageUpload={setIconUrl} currentImageUrl={iconUrl} />
+          </div>
+        </div>
+        <Button onClick={handleSave}
+          className="w-full rounded-lg bg-main-600 py-2 px-6 font-semibold text-white shadow hover:bg-main-700 transition active:scale-95 mt-8">
+          保存
+        </Button>
       </div>
-      <div className="mb-4">
-        <label className="block font-bold mb-1">企業名</label>
-        <Input value={companyName} onChange={e => setCompanyName(e.target.value)} />
-      </div>
-      <div className="mb-4">
-        <label className="block font-bold mb-1">企業プロフィール</label>
-        <textarea className="w-full border rounded p-2" rows={4} value={profile} onChange={e => setProfile(e.target.value)} />
-      </div>
-      <div className="mb-4">
-        <label className="block font-bold mb-1">企業アイコン</label>
-        <ImageUpload onImageUpload={setIconUrl} currentImageUrl={iconUrl} />
-      </div>
-      <div className="mb-4">
-        <label className="block font-bold mb-1">ユーザーID</label>
-        <Input value={user?.uid || ""} disabled />
-      </div>
-      <div className="mb-4">
-        <label className="block font-bold mb-1">企業ID</label>
-        <Input value={companyId} disabled />
-      </div>
-      <div className="mb-4">
-        <label className="block font-bold mb-1">ロール</label>
-        <Input value={role} disabled />
-      </div>
-      <div className="flex justify-end">
-        <Button onClick={handleSave}>保存</Button>
-      </div>
-    </div>
+    </main>
   );
 } 

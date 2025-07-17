@@ -29,14 +29,8 @@ export default function JobList({
     filteredJobs = filteredJobs.filter(job => job.occupation === occupationFilter);
   }
   if (wageFilter) {
-    // wageMin/wageMaxの範囲でフィルタリングする
     const wageFilterNum = Number(wageFilter);
-    filteredJobs = filteredJobs.filter(job => {
-      if (job.wageMax !== undefined && job.wageMax !== null) {
-        return wageFilterNum >= job.wageMin && wageFilterNum <= job.wageMax;
-      }
-      return wageFilterNum === job.wageMin;
-    });
+    filteredJobs = filteredJobs.filter(job => job.wageMin >= wageFilterNum);
   }
 
   // 件数制限

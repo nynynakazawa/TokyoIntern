@@ -31,6 +31,27 @@ export default function JobsPage() {
               onChange={setOccupationFilter} 
             />
           </div>
+          <div className="flex items-center gap-2">
+            <label className="text-xs font-medium text-gray-600">時給</label>
+            <select
+              value={wageFilter}
+              onChange={e => setWageFilter(e.target.value)}
+              className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm transition-all duration-200 hover:border-main-300 hover:shadow-md focus:border-main-500 focus:outline-none focus:ring-2 focus:ring-main-200 w-40"
+            >
+              <option value="">選択</option>
+              {Array.from({length: 12}, (_, i) => 900 + i * 100).map(v => (
+                <option key={v} value={v}>{`¥${v.toLocaleString()}`}</option>
+              ))}
+              {Array.from({length: 6}, (_, i) => 2000 + i * 200).map(v => (
+                <option key={v} value={v}>{`¥${v.toLocaleString()}`}</option>
+              ))}
+              {Array.from({length: 5}, (_, i) => 3000 + i * 500).map(v => (
+                <option key={v} value={v}>{`¥${v.toLocaleString()}`}</option>
+              ))}
+              <option value="5000">¥5,000以上</option>
+            </select>
+            <span className="text-sm text-gray-500">~</span>
+          </div>
         </div>
       </div>
 
