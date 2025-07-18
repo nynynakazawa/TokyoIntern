@@ -14,6 +14,14 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async rewrites() {
+    return [
+      {
+        source: "/__/auth/handler",
+        destination: "/auth/callback",
+      },
+    ];
+  },
   /* config options here */
   reactStrictMode: false,
   typescript: {

@@ -72,7 +72,7 @@ export default function JobApplyPage() {
   if (submitted) {
     return (
       <div className="max-w-xl mx-auto p-6">
-        <h1 className="w-full　text-2xl font-bold mb-6">応募が完了しました</h1>
+        <h1 className="text-2xl font-bold mb-6">応募が完了しました</h1>
         <button 
           type="submit" 
           className="w-full rounded-lg bg-main-600 py-3 px-6 font-semibold text-white text-lg shadow hover:bg-main-700 transition active:scale-95 mt-4 disabled:opacity-60 disabled:cursor-not-allowed"

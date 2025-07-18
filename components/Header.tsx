@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { auth } from "../lib/firebase";
 import { signOut } from "firebase/auth";
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { GoogleAuthProvider, signInWithPopup, signInWithRedirect } from "firebase/auth";
 import { useRouter } from "next/navigation";
 
 export default function Header() {
@@ -44,20 +44,20 @@ export default function Header() {
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: "select_account" });
     try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      const idTokenResult = await user.getIdTokenResult();
-      const role = idTokenResult.claims.role;
-      if (role === "admin") {
-        router.push("/admin");
-      } else if (role === "owner" || role === "company") {
-        router.push("/company");
+      // まずPopupで試行
+      await signInWithPopup(auth, provider);
+    } catch (e: any) {
+      // Popup失敗時はRedirectにフォールバック
+      if (
+        e.code === "auth/popup-blocked" ||
+        e.code === "auth/popup-closed-by-user" ||
+        e.code === "auth/operation-not-supported-in-this-environment"
+      ) {
+        await signInWithRedirect(auth, provider);
       } else {
-        router.push("/");
+        alert("ログインに失敗しました");
+        console.error(e);
       }
-    } catch (e) {
-      alert("ログインに失敗しました");
-      console.error(e);
     }
   };
 
@@ -117,7 +117,7 @@ export default function Header() {
           ) : (
             <>
               <button onClick={handleLogin} className="btn-outline">ログイン</button>
-              <Link href="/register" className="btn-primary">会員登録</Link>
+              <button onClick={handleLogin} className="btn-primary">会員登録</button>
             </>
           )}
         </div>
@@ -161,8 +161,8 @@ export default function Header() {
               </>
             ) : (
               <>
-                <Link href="/login" onClick={() => setOpen(false)}>ログイン</Link>
-                <Link href="/register" onClick={() => setOpen(false)}>会員登録</Link>
+                <button onClick={() => { setOpen(false); handleLogin(); }} className="text-left">ログイン</button>
+                <button onClick={() => { setOpen(false); handleLogin(); }} className="text-left">会員登録</button>
               </>
             )}
           </nav>
