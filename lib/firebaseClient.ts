@@ -1,6 +1,6 @@
 // src/lib/firebaseClient.ts
 import { initializeApp, getApps } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, signOut } from "firebase/auth";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
@@ -15,4 +15,20 @@ const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
 export const storage = getStorage(app);
+
+export const clearAuthAndReload = async () => {
+  try {
+    const auth = getAuth();
+    await signOut(auth);
+    // LocalStorage/IndexedDBもクリア（必要に応じて）
+    localStorage.clear();
+    sessionStorage.clear();
+    // IndexedDB削除（firebaseのDB名は"firebaseLocalStorageDb"など）
+    indexedDB.deleteDatabase("firebaseLocalStorageDb");
+    window.location.reload();
+  } catch (e) {
+    console.error("認証情報のクリアに失敗:", e);
+  }
+};
+
 export default app;

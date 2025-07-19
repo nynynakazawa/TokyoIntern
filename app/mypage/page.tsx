@@ -137,6 +137,12 @@ export default function MyPageDashboard() {
                     <p className="text-gray-800 text-medium">{profile.area}</p>
                   </div>
                 )}
+                {profile?.phone1 && profile?.phone2 && profile?.phone3 && (
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <label className="text-sm font-medium text-gray-600">電話番号</label>
+                    <p className="text-gray-800 text-medium">{profile.phone1}-{profile.phone2}-{profile.phone3}</p>
+                  </div>
+                )}
                 {profile?.profile && (
                   <div className="bg-gray-50 rounded-lg p-4">
                     <label className="text-sm font-medium text-gray-600">自己紹介</label>

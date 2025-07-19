@@ -19,6 +19,7 @@ export default function JobEditPage() {
   const { id } = useParams();
   const [loading, setLoading] = useState(true);
   const [thumbnailUrl, setThumbnailUrl] = useState("");
+  const [jobCompanyId, setJobCompanyId] = useState<string>("");
 
   const {
     register,
@@ -42,6 +43,7 @@ export default function JobEditPage() {
           setValue(key as keyof JobFormInput, value);
         });
         setThumbnailUrl(data.thumbnail || "");
+        setJobCompanyId(data.companyId || "");
       }
       setLoading(false);
     };
@@ -105,7 +107,7 @@ export default function JobEditPage() {
           <label className="block font-bold mb-1">備考</label>
           <Textarea {...register("notes")} rows={3} placeholder="その他の情報があれば記載してください" />
         </div>
-        <ImageUpload onImageUpload={setThumbnailUrl} currentImageUrl={thumbnailUrl} />
+        <ImageUpload onImageUpload={setThumbnailUrl} currentImageUrl={thumbnailUrl} mode="job-thumbnail" companyId={jobCompanyId} />
         <div className="flex justify-end space-x-4">
           <Button
             type="button"

@@ -2,6 +2,14 @@ import Link from "next/link";
 import { Job } from "@/hook/useJobs";
 
 export default function JobCard({ job }: { job: Job }) {
+  const handleCompanyClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (job.companyId) {
+      window.location.href = `/companies/${job.companyId}`;
+    }
+  };
+
   return (
     <Link
       href={`/jobs/${job.id}`}
@@ -41,10 +49,19 @@ export default function JobCard({ job }: { job: Job }) {
             <img
               src={job.companyLogo}
               alt=""
-              className="h-8 w-8 rounded-full border"
+              className="h-8 w-8 rounded-full border object-cover"
             />
           )}
-          <p className="truncate text-xs">{job.companyName ?? ""}</p>
+          {job.companyName && job.companyId ? (
+            <button
+              onClick={handleCompanyClick}
+              className="truncate text-xs text-main-600 hover:text-main-700 hover:underline transition-colors"
+            >
+              {job.companyName}
+            </button>
+          ) : (
+            <p className="truncate text-xs text-gray-500">{job.companyName || ""}</p>
+          )}
         </div>
       </div>
     </Link>

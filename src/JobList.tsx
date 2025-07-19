@@ -15,9 +15,10 @@ export default function JobList({
   occupationFilter?: string;
   wageFilter?: string;
 }) {
-  const { jobs, loading } = useJobs();
+  const { jobs, loading, error } = useJobs();
 
   if (loading) return <div>読み込み中...</div>;
+  if (error) return <div className="text-red-600">{error}</div>;
 
   // フィルター適用
   let filteredJobs = jobs;

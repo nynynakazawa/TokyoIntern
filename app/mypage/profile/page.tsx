@@ -27,6 +27,9 @@ export default function UserProfilePage() {
   const [gradYear, setGradYear] = useState("");
   const [gender, setGender] = useState("");
   const [area, setArea] = useState("");
+  const [phone1, setPhone1] = useState("");
+  const [phone2, setPhone2] = useState("");
+  const [phone3, setPhone3] = useState("");
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
@@ -49,6 +52,9 @@ export default function UserProfilePage() {
           setGradYear(data.gradYear || "");
           setGender(data.gender || "");
           setArea(data.area || "");
+          setPhone1(data.phone1 || "");
+          setPhone2(data.phone2 || "");
+          setPhone3(data.phone3 || "");
         }
         setLoading(false);
       } else {
@@ -75,6 +81,9 @@ export default function UserProfilePage() {
       gradYear,
       gender,
       area,
+      phone1,
+      phone2,
+      phone3,
     }, { merge: true });
     setSaved(true);
     setTimeout(() => {
@@ -149,6 +158,16 @@ export default function UserProfilePage() {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">居住地区</label>
             <AreaFilter value={area} onChange={setArea} />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">電話番号</label>
+            <div className="flex gap-2">
+              <Input value={phone1} onChange={e => setPhone1(e.target.value.replace(/[^0-9]/g, "").slice(0,4))} className="w-16 text-center" maxLength={4} placeholder="0000" />
+              <span className="self-center">-</span>
+              <Input value={phone2} onChange={e => setPhone2(e.target.value.replace(/[^0-9]/g, "").slice(0,4))} className="w-16 text-center" maxLength={4} placeholder="0000" />
+              <span className="self-center">-</span>
+              <Input value={phone3} onChange={e => setPhone3(e.target.value.replace(/[^0-9]/g, "").slice(0,4))} className="w-16 text-center" maxLength={4} placeholder="0000" />
+            </div>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">自己紹介</label>

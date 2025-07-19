@@ -12,10 +12,20 @@ export default function JobDetailPage() {
   const { jobs, loading } = useJobs();
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
+  const [role, setRole] = useState("");
+  const [companyId, setCompanyId] = useState("");
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+    const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
       setUser(currentUser);
+      if (currentUser) {
+        const token = await currentUser.getIdTokenResult();
+        setRole(typeof token.claims.role === "string" ? token.claims.role : "");
+        setCompanyId(typeof token.claims.companyId === "string" ? token.claims.companyId : "");
+      } else {
+        setRole("");
+        setCompanyId("");
+      }
     });
     return () => unsubscribe();
   }, []);
@@ -76,7 +86,10 @@ export default function JobDetailPage() {
           {job.duties && <div className="text-sm text-gray-700">業務内容: {job.duties}</div>}
           {job.notes && <div className="text-sm text-gray-700">備考: {job.notes}</div>}
           {/* 企業情報 */}
-          <div className="flex items-center gap-3 mt-4">
+          <div
+            className="flex items-center gap-3 mt-4 cursor-pointer hover:opacity-80"
+            onClick={() => job.companyId && router.push(`/companies/${job.companyId}`)}
+          >
             {job.companyLogo && (
               <img src={job.companyLogo} alt="企業ロゴ" className="w-10 h-10 rounded-full border" />
             )}
@@ -89,15 +102,39 @@ export default function JobDetailPage() {
         <h2 className="text-xl font-bold mb-2">仕事内容</h2>
         <p>{job.description}</p>
       </section>
-      {/* 企業に応募するボタン */}
-      <div className="mt-8 flex justify-center">
-        <button
-          className="btn-primary px-8 py-3 rounded text-lg"
-          onClick={handleApply}
-        >
-          企業に応募する
-        </button>
-      </div>
+      {/* ボタン表示ロジック */}
+      {(() => {
+        const myCompanyId = companyId || "";
+        const jobCompanyId = job.companyId || "";
+        // adminロールまたはcompanyロールかつ自社求人の場合
+        if (role === "admin" || (role === "company" && myCompanyId && jobCompanyId && myCompanyId === jobCompanyId)) {
+          return (
+            <div className="mt-8 flex justify-center">
+              <button
+                className="btn-primary px-8 py-3 rounded text-lg"
+                onClick={() => router.push(`/company/jobs/${params.id}/edit`)}
+              >
+                求人を修正する
+              </button>
+            </div>
+          );
+        }
+        // companyロールかつ他社求人の場合はボタンを表示しない
+        if (role === "company" && myCompanyId && jobCompanyId && myCompanyId !== jobCompanyId) {
+          return null;
+        }
+        // ownerロールまたは一般ユーザーの場合は従来通り応募ボタン
+        return (
+          <div className="mt-8 flex justify-center">
+            <button
+              className="btn-primary px-8 py-3 rounded text-lg"
+              onClick={handleApply}
+            >
+              企業に応募する
+            </button>
+          </div>
+        );
+      })()}
     </main>
   );
 }

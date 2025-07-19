@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { collection, onSnapshot, getFirestore, QuerySnapshot, DocumentData, query, where } from "firebase/firestore";
+import { collection, onSnapshot, getFirestore, QuerySnapshot, DocumentData, query, where, doc, getDoc } from "firebase/firestore";
 import app from "../../lib/firebaseClient";
 
 export type Job = {
@@ -26,6 +26,7 @@ export type Job = {
 export function useJobs(companyId?: string) {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const db = getFirestore(app);
@@ -37,22 +38,61 @@ export function useJobs(companyId?: string) {
     }
     const unsubscribe = onSnapshot(
       jobsQuery,
-      (snapshot: QuerySnapshot<DocumentData>) => {
-        const jobsData = snapshot.docs.map((doc) => {
-          const data = doc.data();
-          return {
-            id: doc.id,
-            ...data,
-            wageMin: typeof data.wageMin === "number" ? data.wageMin : Number(data.wageMin),
-            wageMax: data.wageMax !== undefined ? Number(data.wageMax) : undefined,
-          } as Job;
-        });
-        setJobs(jobsData);
+      async (snapshot: QuerySnapshot<DocumentData>) => {
+        try {
+          const jobsData = await Promise.all(
+            snapshot.docs.map(async (docSnapshot) => {
+              const data = docSnapshot.data();
+              const job: Job = {
+                id: docSnapshot.id,
+                title: data.title || "",
+                description: data.description || "",
+                wageMin: typeof data.wageMin === "number" ? data.wageMin : Number(data.wageMin),
+                wageMax: data.wageMax !== undefined ? Number(data.wageMax) : undefined,
+                conditions: data.conditions || "",
+                duties: data.duties || "",
+                notes: data.notes || "",
+                companyId: data.companyId || "",
+                createdAt: data.createdAt || "",
+                thumbnail: data.thumbnail || "",
+                area: data.area || "",
+                occupation: data.occupation || "",
+                companyLogo: data.companyLogo || "",
+                companyName: data.companyName || "",
+              };
+
+              // 会社情報を取得
+              if (data.companyId) {
+                try {
+                  const companyRef = doc(db, "companies", data.companyId);
+                  const companySnap = await getDoc(companyRef);
+                  if (companySnap.exists()) {
+                    const companyData = companySnap.data() as any;
+                    job.companyName = companyData.name || "";
+                    job.companyLogo = companyData.iconUrl || "";
+                  }
+                } catch (error) {
+                  console.error("会社情報の取得に失敗:", error);
+                }
+              }
+
+              return job;
+            })
+          );
+          setJobs(jobsData);
+        } catch (e) {
+          setError("求人情報の取得に失敗しました");
+        } finally {
+          setLoading(false);
+        }
+      },
+      (err) => {
+        setError("求人情報の取得に失敗しました");
         setLoading(false);
       }
     );
     return () => unsubscribe();
   }, [companyId]);
 
-  return { jobs, loading };
+  return { jobs, loading, error };
 }

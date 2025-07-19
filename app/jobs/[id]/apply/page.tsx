@@ -61,6 +61,9 @@ export default function JobApplyPage() {
         email: user.email || profile?.email || "",
         selfIntro: profile?.selfIntro || "",
         iconUrl: profile?.iconUrl || "",
+        phone1: profile?.phone1 || "",
+        phone2: profile?.phone2 || "",
+        phone3: profile?.phone3 || "",
       },
       appeal,
       createdAt: serverTimestamp(),
@@ -155,6 +158,12 @@ export default function JobApplyPage() {
                     <div className="bg-gray-50 rounded-lg p-4">
                       <label className="text-sm font-medium text-gray-600">居住地</label>
                       <p className="text-gray-800 font-medium">{profile.area}</p>
+                    </div>
+                  )}
+                  {profile?.phone1 && profile?.phone2 && profile?.phone3 && (
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <label className="text-sm font-medium text-gray-600">電話番号</label>
+                      <p className="text-gray-800 font-medium">{profile.phone1}-{profile.phone2}-{profile.phone3}</p>
                     </div>
                   )}
                 </div>

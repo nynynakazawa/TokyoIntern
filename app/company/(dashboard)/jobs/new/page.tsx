@@ -111,7 +111,7 @@ function JobCreateForm({ companyId }: { companyId: string }) {
           <label className="block font-bold mb-1">備考</label>
           <Textarea {...register("notes")} rows={3} placeholder="その他の情報があれば記載してください" />
         </div>
-        <ImageUpload onImageUpload={setThumbnailUrl} />
+        <ImageUpload onImageUpload={setThumbnailUrl} mode="job-thumbnail" companyId={companyId} />
         <div className="flex justify-end space-x-4">
           <Button
             type="button"

@@ -8,6 +8,7 @@ import app from "../../../../lib/firebaseClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import ImageUpload from "../../../../components/ImageUpload";
+import AreaFilter from "../../../../components/Filters/AreaFilter";
 
 export default function CompanyProfilePage() {
   const router = useRouter();
@@ -17,6 +18,11 @@ export default function CompanyProfilePage() {
   const [companyName, setCompanyName] = useState("");
   const [profile, setProfile] = useState("");
   const [iconUrl, setIconUrl] = useState("");
+  const [area, setArea] = useState("");
+  const [phone1, setPhone1] = useState("");
+  const [phone2, setPhone2] = useState("");
+  const [phone3, setPhone3] = useState("");
+  const [website, setWebsite] = useState("");
   const [loading, setLoading] = useState(true);
   const [saved, setSaved] = useState(false);
 
@@ -36,6 +42,15 @@ export default function CompanyProfilePage() {
             setCompanyName(data.name || "");
             setProfile(data.profile || "");
             setIconUrl(data.iconUrl || "");
+            setArea(data.area || "");
+            // 電話番号を3つの部分に分割
+            if (data.phone) {
+              const phoneParts = data.phone.split('-');
+              setPhone1(phoneParts[0] || "");
+              setPhone2(phoneParts[1] || "");
+              setPhone3(phoneParts[2] || "");
+            }
+            setWebsite(data.website || "");
           }
         }
         setLoading(false);
@@ -50,10 +65,17 @@ export default function CompanyProfilePage() {
     if (!companyId) return;
     const db = getFirestore(app);
     const ref = doc(collection(db, "companies"), companyId as string);
+    
+    // 電話番号を結合
+    const phone = [phone1, phone2, phone3].filter(Boolean).join('-');
+    
     await setDoc(ref, {
       name: companyName,
       profile,
       iconUrl,
+      area,
+      phone,
+      website,
     }, { merge: true });
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
@@ -77,6 +99,47 @@ export default function CompanyProfilePage() {
             <label className="block text-sm font-medium text-gray-700 mb-1">企業プロフィール</label>
             <textarea className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-main-300 focus:border-main-400 transition resize-none"
               rows={4} value={profile} onChange={e => setProfile(e.target.value)} />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">所在地</label>
+            <AreaFilter value={area} onChange={setArea} />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">電話番号</label>
+            <div className="flex gap-2">
+              <Input 
+                value={phone1} 
+                onChange={e => setPhone1(e.target.value)}
+                placeholder="03"
+                maxLength={4}
+                className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-main-300 focus:border-main-400 transition" 
+              />
+              <span className="flex items-center text-gray-500">-</span>
+              <Input 
+                value={phone2} 
+                onChange={e => setPhone2(e.target.value)}
+                placeholder="1234"
+                maxLength={4}
+                className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-main-300 focus:border-main-400 transition" 
+              />
+              <span className="flex items-center text-gray-500">-</span>
+              <Input 
+                value={phone3} 
+                onChange={e => setPhone3(e.target.value)}
+                placeholder="5678"
+                maxLength={4}
+                className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-main-300 focus:border-main-400 transition" 
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">企業HP</label>
+            <Input 
+              value={website} 
+              onChange={e => setWebsite(e.target.value)}
+              placeholder="https://example.com"
+              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-main-300 focus:border-main-400 transition" 
+            />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">企業アイコン</label>
