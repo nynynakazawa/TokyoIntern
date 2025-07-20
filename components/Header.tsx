@@ -35,6 +35,7 @@ export default function Header() {
     try {
       await signOut(auth);
       console.log("ログアウト成功");
+      router.push("/"); // ログアウト後にトップページへリダイレクト
     } catch (error) {
       console.error("ログアウトエラー:", error);
     }

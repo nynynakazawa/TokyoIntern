@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import ImageUpload from "../../../../../../components/ImageUpload";
 import AreaFilter from "../../../../../../components/Filters/AreaFilter";
+import OccupationFilter from "../../../../../../components/Filters/OccupationFilter";
 
 export default function JobEditPage() {
   const router = useRouter();
@@ -93,7 +94,8 @@ export default function JobEditPage() {
         </div>
         <div>
           <label className="block font-bold mb-1">職種</label>
-          <Input {...register("occupation")} placeholder="例: エンジニア" />
+          <OccupationFilter value={watch("occupation") ?? ""} onChange={v => setValue("occupation", v, { shouldValidate: true })} />
+          {errors.occupation && <p className="text-red-500 text-sm">{errors.occupation.message}</p>}
         </div>
         <div>
           <label className="block font-bold mb-1">条件</label>

@@ -16,11 +16,12 @@ export default function JobCard({ job }: { job: Job }) {
       className="group flex flex-col overflow-hidden rounded-lg border border-gray-100 bg-white shadow-sm transition hover:shadow-md"
     >
       {/* サムネイル */}
-      <div className="relative h-40 bg-gray-200">
+      <div className="relative w-full aspect-[4/3] bg-gray-200 flex items-center justify-center">
         <img
           src={job.thumbnail ?? "/noimage.png"}
-          alt=""
-          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          alt="サムネイル"
+          className="h-full w-auto max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
+          style={{ display: 'block', margin: '0 auto' }}
         />
       </div>
 

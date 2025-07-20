@@ -125,14 +125,14 @@ export default function JobDetailPage() {
         }
         // ownerロールまたは一般ユーザーの場合は従来通り応募ボタン
         return (
-          <div className="mt-8 flex justify-center">
-            <button
-              className="btn-primary px-8 py-3 rounded text-lg"
-              onClick={handleApply}
-            >
-              企業に応募する
-            </button>
-          </div>
+      <div className="mt-8 flex justify-center">
+        <button
+          className="btn-primary px-8 py-3 rounded text-lg"
+          onClick={handleApply}
+        >
+          企業に応募する
+        </button>
+      </div>
         );
       })()}
     </main>

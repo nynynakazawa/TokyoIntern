@@ -6,7 +6,7 @@ export default function MyPageLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen">
       {/* Sidebar */}
-      <aside className="w-64 bg-blue-50 border-r flex flex-col p-4">
+      <aside className="sidebar w-64 bg-blue-50 border-r flex flex-col p-4">
         <h2 className="text-xl font-bold mb-6">マイメニュー</h2>
         <nav className="flex flex-col gap-2">
         <Button asChild variant="ghost" className="justify-start">

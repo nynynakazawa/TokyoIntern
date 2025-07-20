@@ -24,7 +24,7 @@ export default function CompanyDashboard() {
         const idTokenResult = await currentUser.getIdTokenResult();
         const role = idTokenResult.claims.role;
         const companyId = idTokenResult.claims.companyId;
-        if (role !== "owner") {
+        if (role !== "company") {
           alert("企業オーナー権限が必要です");
           router.push("/login");
           return;

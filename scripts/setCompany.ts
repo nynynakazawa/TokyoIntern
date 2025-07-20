@@ -4,7 +4,7 @@ import { adminAuth } from "../lib/firebaseAdmin";
 async function setCompanyRole(uid: string, companyId: string) {
   try {
     await adminAuth.setCustomUserClaims(uid, {
-      role: "owner",
+      role: "company",
       companyId: companyId
     });
     console.log(`User ${uid} is now company owner with companyId: ${companyId}`);

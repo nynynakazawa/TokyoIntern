@@ -81,7 +81,7 @@ export default function ImageUpload({ onImageUpload, currentImageUrl, companyId,
         
         if (targetAspect === 1) {
           // 正方形の場合
-          const size = Math.min(img.width, img.height);
+        const size = Math.min(img.width, img.height);
           cropWidth = size;
           cropHeight = size;
           offsetX = (img.width - size) / 2;

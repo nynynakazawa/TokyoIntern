@@ -8,12 +8,14 @@ export default function JobList({
   limit, 
   areaFilter = "", 
   occupationFilter = "", 
-  wageFilter = "" 
+  wageFilter = "", 
+  searchKeyword = "" 
 }: { 
   limit?: number;
   areaFilter?: string;
   occupationFilter?: string;
   wageFilter?: string;
+  searchKeyword?: string;
 }) {
   const { jobs, loading, error } = useJobs();
 
@@ -32,6 +34,13 @@ export default function JobList({
   if (wageFilter) {
     const wageFilterNum = Number(wageFilter);
     filteredJobs = filteredJobs.filter(job => job.wageMin >= wageFilterNum);
+  }
+  if (searchKeyword) {
+    const keyword = searchKeyword.toLowerCase();
+    filteredJobs = filteredJobs.filter(job =>
+      (job.title && job.title.toLowerCase().includes(keyword)) ||
+      (job.description && job.description.toLowerCase().includes(keyword))
+    );
   }
 
   // 件数制限

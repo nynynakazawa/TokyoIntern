@@ -7,7 +7,7 @@ export default function AdminDashboardLayout({ children }: { children: ReactNode
   return (
     <div className="flex min-h-screen">
       {/* Sidebar */}
-      <aside className="w-64 bg-gray-100 border-r flex flex-col p-4">
+      <aside className="sidebar w-64 bg-gray-100 border-r flex flex-col p-4">
         <h2 className="text-xl font-bold mb-6">管理者メニュー</h2>
         <nav className="flex flex-col gap-2">
           <Button asChild variant="ghost" className="justify-start">

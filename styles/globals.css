@@ -139,10 +139,62 @@
 }
 
 @layer base {
+  /* スマホだけ適用 */
+  @media (max-width: 768px) {
+    html {
+      /* 左上基準で 0.8 倍 */
+      transform: scale(.85);
+      transform-origin: 0 0;
+
+      /* 拡大前の実幅／高さを補正 */
+      width: calc(100vw / .85);   /* = 125vw */
+      height: calc(100vh / .85);  /* = 125vh */
+    }
+
+    body {
+      margin: 0;          /* 余白リセット */
+      overflow-x: hidden; /* 横スクロール防止 */
+      box-sizing: border-box;
+    }
+    .sidebar {
+      display: none !important;
+    }
+  }
+  
+}
+
+@layer base {
   * {
     @apply border-border;
   }
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* --- 共通selectドロップダウンデザイン --- */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: #fff;
+  border: 1.5px solid #d1d5db; /* gray-300 */
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #374151; /* gray-700 */
+  box-shadow: 0 1px 2px 0 rgba(0,0,0,0.03);
+  transition: border 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+select:focus {
+  border-color: #2563eb; /* main-500 or blue-600 */
+  box-shadow: 0 0 0 2px #93c5fd44;
+}
+select:hover {
+  border-color: #93c5fd; /* blue-300 */
+}
+option {
+  color: #374151;
 }

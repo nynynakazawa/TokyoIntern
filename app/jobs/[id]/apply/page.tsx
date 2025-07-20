@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { auth } from "../../../../lib/firebase";
-import { getFirestore, doc, getDoc, setDoc, collection, serverTimestamp } from "firebase/firestore";
+import { getFirestore, doc, getDoc, setDoc, collection, serverTimestamp, getDocs } from "firebase/firestore";
 import app from "../../../../lib/firebaseClient";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Job, Application } from "@/types";
 
 export default function JobApplyPage() {
   const params = useParams();
@@ -16,19 +17,28 @@ export default function JobApplyPage() {
   const [appeal, setAppeal] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
       setUser(currentUser);
       if (currentUser) {
-        // Firestoreからプロフィール取得
         const db = getFirestore(app);
+        // 自分の応募データのみ取得
+        const userApplicationsRef = collection(db, "applications", currentUser.uid, "userApplications");
+        const userApplicationsSnap = await getDocs(userApplicationsRef);
+        const apps: Application[] = userApplicationsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Application));
+        setApplications(apps);
+
+        // Firestoreからプロフィール取得
         const ref = doc(db, "users", currentUser.uid);
         const snap = await getDoc(ref);
         if (snap.exists()) {
           setProfile(snap.data());
         }
       }
+      setLoading(false);
     });
     return () => unsubscribe();
   }, []);
@@ -50,11 +60,12 @@ export default function JobApplyPage() {
       setSubmitting(false);
       return;
     }
-    // applicationsコレクションに保存（jobId+userIdでユニーク）
-    const ref = doc(collection(db, "applications"), `${jobId}_${user.uid}`);
-    await setDoc(ref, {
+    // applications/{userId}/userApplications/{applicationId} に保存
+    const userApplicationsRef = collection(db, "applications", user.uid, "userApplications");
+    const applicationRef = doc(userApplicationsRef); // applicationId自動生成
+    await setDoc(applicationRef, {
       jobId,
-      companyId, // ←必ずセット
+      companyId,
       applicantId: user.uid,
       applicantProfile: {
         name: user.displayName || profile?.name || "",
@@ -64,6 +75,14 @@ export default function JobApplyPage() {
         phone1: profile?.phone1 || "",
         phone2: profile?.phone2 || "",
         phone3: profile?.phone3 || "",
+        university: profile?.university || "",
+        faculty: profile?.faculty || "",
+        department: profile?.department || "",
+        field: profile?.field || "",
+        gradYear: profile?.gradYear || "",
+        gender: profile?.gender || "",
+        area: profile?.area || "",
+        profile: profile?.profile || "",
       },
       appeal,
       createdAt: serverTimestamp(),
