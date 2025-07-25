@@ -58,7 +58,7 @@ export default function ProfileClient() {
   if (loading) return <div className="p-8">読み込み中...</div>;
 
   return (
-    <main className="min-h-[60vh] bg-gray-50 py-8">
+    <main className="min-h-[60vh] py-8">
       <div className="max-w-4xl mx-auto px-6">
         {/* ヘッダーセクション */}
         <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">

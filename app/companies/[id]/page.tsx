@@ -77,7 +77,7 @@ export default function CompanyDetailPage() {
   }
 
   return (
-    <main className="min-h-[60vh] bg-gray-50 py-8">
+    <main className="min-h-[60vh] py-8">
       <div className="max-w-6xl mx-auto px-6">
         {/* 戻るボタン */}
         <div className="mb-6">

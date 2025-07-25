@@ -21,7 +21,7 @@ export default function MyPageLayout({ children }: { children: ReactNode }) {
         </nav>
       </aside>
       {/* Main Content */}
-      <main className="flex-1 p-8">{children}</main>
+      <main className=" bg-gray-100">{children}</main>
     </div>
   );
 } 

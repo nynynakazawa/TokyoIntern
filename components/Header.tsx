@@ -92,44 +92,44 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-100">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 relative">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 md:py-5 relative">
         {/* ロゴ */}
-        <Link href="/" className="flex items-center gap-2 font-bold text-main-600 text-xl">
-          <svg viewBox="0 0 24 24" className="h-7 w-7 fill-current">
+        <Link href="/" className="flex items-center gap-3 font-bold text-main-600 text-2xl">
+          <svg viewBox="0 0 24 24" className="h-9 w-9 md:h-10 md:w-10 fill-current">
             <circle cx="12" cy="12" r="10" />
           </svg>
           トウキョウインターン
         </Link>
 
         {/* PCナビ */}
-        <nav className="hidden md:flex gap-6 text-xl">
+        <nav className="hidden md:flex gap-8 text-2xl">
           <Link href="/jobs" className="nav-link">求人検索</Link>
           <Link href="/about" className="nav-link">会社概要</Link>
           <Link href="/contact" className="nav-link">お問い合わせ</Link>
         </nav>
 
         {/* 右側ボタン */}
-        <div className="hidden items-center gap-3 md:flex text-lg">
+        <div className="hidden items-center gap-4 md:flex text-xl">
           {user ? (
             <>
-              <button onClick={handleLogout} className="btn-outline">ログアウト</button>
-              <Link href={getAdminPageLink()} className="btn-primary">{getAdminPageLabel()}</Link>
+              <button onClick={handleLogout} className="btn-outline py-2 px-5">ログアウト</button>
+              <Link href={getAdminPageLink()} className="btn-primary py-2 px-6">{getAdminPageLabel()}</Link>
             </>
           ) : (
             <>
-              <button onClick={handleLogin} className="btn-outline">ログイン</button>
-              <button onClick={handleLogin} className="btn-primary">会員登録</button>
+              <button onClick={handleLogin} className="btn-outline py-2 px-5">ログイン</button>
+              <button onClick={handleLogin} className="btn-primary py-2 px-6">会員登録</button>
             </>
           )}
         </div>
 
         {/* SPハンバーガー */}
         <button
-          className="block md:hidden"
+          className="block md:hidden ml-2"
           aria-label="Menu"
           onClick={() => setOpen((v) => !v)}
         >
-          <svg viewBox="0 0 24 24" className="h-6 w-6">
+          <svg viewBox="0 0 24 24" className="h-8 w-8">
             <path
               fill="none"
               stroke="currentColor"
@@ -146,8 +146,8 @@ export default function Header() {
         >
           <nav
             className={`
-              absolute top-0 right-0 w-64 h-full bg-white p-6 flex flex-col gap-6
-              transition-transform duration-300 text-lg
+              absolute top-0 right-0 w-72 h-full bg-white p-8 flex flex-col gap-8
+              transition-transform duration-300 text-xl
               ${open ? "translate-x-0" : "translate-x-full"}
             `}
             onClick={(e) => e.stopPropagation()}
