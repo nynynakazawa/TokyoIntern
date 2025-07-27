@@ -6,9 +6,12 @@ import Link from "next/link";
 import { deleteJob } from "../../../../lib/serverActions/jobActions";
 import { useEffect, useState } from "react";
 import { auth } from "../../../../lib/firebaseClient";
+import LoadingAnimation from "../../../../components/LoadingAnimation";
+import { confirmDelete } from "../../../../lib/utils/deleteConfirmation";
 
 export default function JobListTable() {
   const [companyId, setCompanyId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCompanyId = async () => {
@@ -24,14 +27,21 @@ export default function JobListTable() {
   const { jobs, loading } = useJobs(companyId || undefined);
 
   const handleDelete = async (id: string) => {
-    if (confirm("本当に削除しますか？")) {
-      await deleteJob(id);
-      // useJobsはonSnapshotなので自動で再取得される
+    if (await confirmDelete("この求人を削除しますか？")) {
+      try {
+        setDeleting(id);
+        await deleteJob(id);
+      } catch (error) {
+        alert("削除中にエラーが発生しました。");
+        console.error(error);
+      } finally {
+        setDeleting(null);
+      }
     }
   };
 
   if (!companyId) return <div>企業情報を取得中...</div>;
-  if (loading) return <div>読み込み中...</div>;
+  if (loading) return <LoadingAnimation />;
 
   return (
     <>
@@ -65,8 +75,13 @@ export default function JobListTable() {
                 <Link href={`/company/jobs/${job.id}/edit`}>
                   <Button size="sm" variant="outline" className="mr-2">編集</Button>
                 </Link>
-                <Button size="sm" variant="destructive" onClick={() => handleDelete(job.id)}>
-                  削除
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => handleDelete(job.id)}
+                  disabled={deleting === job.id}
+                >
+                  {deleting === job.id ? "削除中..." : "削除"}
                 </Button>
               </td>
             </tr>

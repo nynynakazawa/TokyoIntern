@@ -5,6 +5,7 @@ import { auth } from "../../../lib/firebase";
 import { useRouter } from "next/navigation";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
 import app from "../../../lib/firebaseClient";
+import LoadingAnimation from "../../../components/LoadingAnimation";
 
 export default function CompanyDashboard() {
   const router = useRouter();
@@ -56,14 +57,7 @@ export default function CompanyDashboard() {
   }, [router]);
 
   if (!user || loading) {
-    return (
-      <div className="min-h-[60vh] flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 border-b-2 border-main-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">読み込み中...</p>
-        </div>
-      </div>
-    );
+    return <LoadingAnimation />;
   }
 
   return (

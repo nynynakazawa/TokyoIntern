@@ -7,7 +7,11 @@ import Link from "next/link";
 export const metadata = { title: "Admin｜TokyoIntern" };
 
 // ✅ 本番ではここで認可チェック（session / role）を挟む
-export default function AdminLayout({ children }: { children: ReactNode }) {
+export default function AdminLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
   return (
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar */}
@@ -30,10 +34,10 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       </aside>
       {/* Main Content */}
       <main className="flex-1 flex flex-col items-center justify-start py-8">
-        <div className="w-full max-w-4xl px-6">
-      {children}
+        <div className="w-full px-6">
+          {children}
         </div>
-    </main>
+      </main>
     </div>
   );
 }

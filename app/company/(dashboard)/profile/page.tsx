@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import ImageUpload from "../../../../components/ImageUpload";
 import AreaFilter from "../../../../components/Filters/AreaFilter";
+import LoadingAnimation from "../../../../components/LoadingAnimation";
 
 export default function CompanyProfilePage() {
   const router = useRouter();
@@ -82,74 +83,84 @@ export default function CompanyProfilePage() {
     router.push("/company");
   };
 
-  if (loading) return <div>読み込み中...</div>;
+  if (loading) return <LoadingAnimation />;
 
   return (
-    <main className="min-h-[60vh] flex items-center justify-center bg-gray-50 py-8">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
-        <h1 className="text-2xl font-bold mb-8 text-center text-main-700">企業プロフィール編集</h1>
-        {saved && <p className="text-green-600 text-center font-semibold mb-4">保存しました！</p>}
-        <div className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">企業名</label>
-            <Input value={companyName} onChange={e => setCompanyName(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-main-300 focus:border-main-400 transition" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">企業プロフィール</label>
-            <textarea className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-main-300 focus:border-main-400 transition resize-none"
-              rows={4} value={profile} onChange={e => setProfile(e.target.value)} />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">所在地</label>
-            <AreaFilter value={area} onChange={setArea} />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">電話番号</label>
-            <div className="flex gap-2">
-              <Input 
-                value={phone1} 
-                onChange={e => setPhone1(e.target.value)}
-                placeholder="03"
-                maxLength={4}
-                className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-main-300 focus:border-main-400 transition" 
-              />
-              <span className="flex items-center text-gray-500">-</span>
-              <Input 
-                value={phone2} 
-                onChange={e => setPhone2(e.target.value)}
-                placeholder="1234"
-                maxLength={4}
-                className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-main-300 focus:border-main-400 transition" 
-              />
-              <span className="flex items-center text-gray-500">-</span>
-              <Input 
-                value={phone3} 
-                onChange={e => setPhone3(e.target.value)}
-                placeholder="5678"
-                maxLength={4}
-                className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-main-300 focus:border-main-400 transition" 
-              />
+    <main className="min-h-[60vh] flex items-center justify-center bg-gray-50 py-12">
+      <div className="w-full max-w-5xl px-6">
+        <div className="bg-white rounded-2xl shadow-xl p-8">
+          <h1 className="text-2xl font-bold mb-8 text-center text-main-700">企業プロフィール編集</h1>
+          {saved && <p className="text-green-600 text-center font-semibold mb-4">保存しました！</p>}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* 基本情報 */}
+            <div className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">企業名</label>
+                <Input value={companyName} onChange={e => setCompanyName(e.target.value)}
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-main-300 focus:border-main-400 transition" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">企業プロフィール</label>
+                <textarea className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-main-300 focus:border-main-400 transition resize-none"
+                  rows={4} value={profile} onChange={e => setProfile(e.target.value)} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">所在地</label>
+                <AreaFilter value={area} onChange={setArea} />
+              </div>
+            </div>
+
+            {/* 連絡先情報とアイコン */}
+            <div className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">電話番号</label>
+                <div className="flex gap-2">
+                  <Input 
+                    value={phone1} 
+                    onChange={e => setPhone1(e.target.value)}
+                    placeholder="03"
+                    maxLength={4}
+                    className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-main-300 focus:border-main-400 transition" 
+                  />
+                  <span className="flex items-center text-gray-500">-</span>
+                  <Input 
+                    value={phone2} 
+                    onChange={e => setPhone2(e.target.value)}
+                    placeholder="1234"
+                    maxLength={4}
+                    className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-main-300 focus:border-main-400 transition" 
+                  />
+                  <span className="flex items-center text-gray-500">-</span>
+                  <Input 
+                    value={phone3} 
+                    onChange={e => setPhone3(e.target.value)}
+                    placeholder="5678"
+                    maxLength={4}
+                    className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-main-300 focus:border-main-400 transition" 
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">企業HP</label>
+                <Input 
+                  value={website} 
+                  onChange={e => setWebsite(e.target.value)}
+                  placeholder="https://example.com"
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-main-300 focus:border-main-400 transition" 
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">企業アイコン</label>
+                <ImageUpload onImageUpload={setIconUrl} currentImageUrl={iconUrl} />
+              </div>
             </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">企業HP</label>
-            <Input 
-              value={website} 
-              onChange={e => setWebsite(e.target.value)}
-              placeholder="https://example.com"
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-main-300 focus:border-main-400 transition" 
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">企業アイコン</label>
-            <ImageUpload onImageUpload={setIconUrl} currentImageUrl={iconUrl} />
-          </div>
+
+          <Button onClick={handleSave}
+            className="w-full rounded-lg bg-main-600 py-2 px-6 font-semibold text-white shadow hover:bg-main-700 transition active:scale-95 mt-8">
+            保存
+          </Button>
         </div>
-        <Button onClick={handleSave}
-          className="w-full rounded-lg bg-main-600 py-2 px-6 font-semibold text-white shadow hover:bg-main-700 transition active:scale-95 mt-8">
-          保存
-        </Button>
       </div>
     </main>
   );

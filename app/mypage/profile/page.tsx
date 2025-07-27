@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import ImageUpload from "../../../components/ImageUpload";
 import AreaFilter from "../../../components/Filters/AreaFilter";
-import { updateProfile } from "firebase/auth";
+import LoadingAnimation from "../../../components/LoadingAnimation";
 
 export default function UserProfilePage() {
   const router = useRouter();
@@ -66,7 +66,7 @@ export default function UserProfilePage() {
 
   const handleSave = async () => {
     if (!user) return;
-    await updateProfile(user, { displayName: name, photoURL: iconUrl });
+    // await updateProfile(user, { displayName: name, photoURL: iconUrl }); // This line was removed as per the new_code
     const db = getFirestore(app);
     const ref = doc(db, "users", user.uid);
     await setDoc(ref, {
@@ -92,97 +92,115 @@ export default function UserProfilePage() {
     }, 2000);
   };
 
-  if (loading) return <div>読み込み中...</div>;
+  if (loading) return <LoadingAnimation />;
 
   return (
-    <main className="min-h-[60vh] flex items-center justify-center bg-gray-50 py-8">
-      <div className="w-full max-w-lg bg-white rounded-2xl shadow-xl p-8">
-        <h1 className="text-2xl font-bold mb-8 text-center text-main-700">プロフィール編集</h1>
-        {saved && <p className="text-green-600 text-center font-semibold mb-4">保存しました！</p>}
-        <div className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">名前</label>
-            <Input value={name} onChange={e => setName(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-main-300 focus:border-main-400 transition" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">メールアドレス</label>
-            <Input value={email} disabled
-              className="w-full rounded-lg border border-gray-200 bg-gray-100 px-4 py-2" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">大学/大学院名（正式名称）</label>
-            <Input value={university} onChange={e => setUniversity(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-main-300 focus:border-main-400 transition" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">学部（研究科）</label>
-            <Input value={faculty} onChange={e => setFaculty(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-main-300 focus:border-main-400 transition" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">学科（専攻）</label>
-            <Input value={department} onChange={e => setDepartment(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-main-300 focus:border-main-400 transition" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">文系/理系</label>
-            <select value={field} onChange={e => setField(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-main-300 focus:border-main-400 transition">
-              <option value="">選択してください</option>
-              <option value="文系">文系</option>
-              <option value="理系">理系</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">卒業年度</label>
-            <select value={gradYear} onChange={e => setGradYear(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-main-300 focus:border-main-400 transition">
-              <option value="">選択してください</option>
-              {Array.from({ length: 11 }, (_, i) => {
-                const year = new Date().getFullYear() + i;
-                return <option key={year} value={year}>{year}年</option>;
-              })}
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">性別</label>
-            <select value={gender} onChange={e => setGender(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-main-300 focus:border-main-400 transition">
-              <option value="">選択してください</option>
-              <option value="男性">男性</option>
-              <option value="女性">女性</option>
-              <option value="回答しない">回答しない</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">居住地区</label>
-            <AreaFilter value={area} onChange={setArea} />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">電話番号</label>
-            <div className="flex gap-2">
-              <Input value={phone1} onChange={e => setPhone1(e.target.value.replace(/[^0-9]/g, "").slice(0,4))} className="w-16 text-center" maxLength={4} placeholder="0000" />
-              <span className="self-center">-</span>
-              <Input value={phone2} onChange={e => setPhone2(e.target.value.replace(/[^0-9]/g, "").slice(0,4))} className="w-16 text-center" maxLength={4} placeholder="0000" />
-              <span className="self-center">-</span>
-              <Input value={phone3} onChange={e => setPhone3(e.target.value.replace(/[^0-9]/g, "").slice(0,4))} className="w-16 text-center" maxLength={4} placeholder="0000" />
+    <main className="min-h-[60vh] flex items-center justify-center bg-gray-50 py-12">
+      <div className="w-full max-w-5xl px-6">
+        <div className="bg-white rounded-2xl shadow-xl p-8">
+          <h1 className="text-2xl font-bold mb-8 text-center text-main-700">プロフィール編集</h1>
+          {saved && <p className="text-green-600 text-center font-semibold mb-4">保存しました！</p>}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* 基本情報 */}
+            <div className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">名前</label>
+                <Input value={name} onChange={e => setName(e.target.value)}
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-main-300 focus:border-main-400 transition" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">自己紹介</label>
+                <textarea className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-main-300 focus:border-main-400 transition resize-none"
+                  rows={4} value={profile} onChange={e => setProfile(e.target.value)} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">性別</label>
+                <select
+                  value={gender}
+                  onChange={e => setGender(e.target.value)}
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-main-300 focus:border-main-400 transition"
+                >
+                  <option value="">選択してください</option>
+                  <option value="男性">男性</option>
+                  <option value="女性">女性</option>
+                  <option value="その他">その他</option>
+                  <option value="回答しない">回答しない</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">居住地</label>
+                <AreaFilter value={area} onChange={setArea} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">電話番号</label>
+                <div className="flex gap-2">
+                  <Input 
+                    value={phone1} 
+                    onChange={e => setPhone1(e.target.value)}
+                    placeholder="03"
+                    maxLength={4}
+                    className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-main-300 focus:border-main-400 transition" 
+                  />
+                  <span className="flex items-center text-gray-500">-</span>
+                  <Input 
+                    value={phone2} 
+                    onChange={e => setPhone2(e.target.value)}
+                    placeholder="1234"
+                    maxLength={4}
+                    className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-main-300 focus:border-main-400 transition" 
+                  />
+                  <span className="flex items-center text-gray-500">-</span>
+                  <Input 
+                    value={phone3} 
+                    onChange={e => setPhone3(e.target.value)}
+                    placeholder="5678"
+                    maxLength={4}
+                    className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-main-300 focus:border-main-400 transition" 
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* 学歴情報とアイコン */}
+            <div className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">大学</label>
+                <Input value={university} onChange={e => setUniversity(e.target.value)}
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-main-300 focus:border-main-400 transition" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">学部（研究科）</label>
+                <Input value={faculty} onChange={e => setFaculty(e.target.value)}
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-main-300 focus:border-main-400 transition" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">専攻</label>
+                <Input value={department} onChange={e => setDepartment(e.target.value)}
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-main-300 focus:border-main-400 transition" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">分野</label>
+                <Input value={field} onChange={e => setField(e.target.value)}
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-main-300 focus:border-main-400 transition" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">卒業年</label>
+                <Input value={gradYear} onChange={e => setGradYear(e.target.value)}
+                  type="number" min="2000" max="2030" placeholder="例: 2025"
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-main-300 focus:border-main-400 transition" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">プロフィール画像</label>
+                <ImageUpload onImageUpload={setIconUrl} currentImageUrl={iconUrl} />
+              </div>
             </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">自己紹介</label>
-            <textarea className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-main-300 focus:border-main-400 transition resize-none"
-              rows={4} value={profile} onChange={e => setProfile(e.target.value)} />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">アイコン</label>
-            <ImageUpload onImageUpload={setIconUrl} currentImageUrl={iconUrl} />
-          </div>
+
+          <Button onClick={handleSave}
+            className="w-full rounded-lg bg-main-600 py-2 px-6 font-semibold text-white shadow hover:bg-main-700 transition active:scale-95 mt-8">
+            保存
+          </Button>
         </div>
-        <Button onClick={handleSave}
-          className="w-full rounded-lg bg-main-600 py-2 px-6 font-semibold text-white shadow hover:bg-main-700 transition active:scale-95 mt-8">
-          保存
-        </Button>
       </div>
     </main>
   );

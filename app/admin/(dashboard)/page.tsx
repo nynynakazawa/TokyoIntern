@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import { auth } from "../../../lib/firebase";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import LoadingAnimation from "../../../components/LoadingAnimation";
+import AdminContentWrapper from "../../../components/AdminContentWrapper";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -33,19 +36,10 @@ export default function AdminDashboard() {
     return () => unsubscribe();
   }, [router]);
 
-  if (!user || loading) {
-    return (
-      <div className="min-h-[60vh] flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 border-b-2 border-main-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">読み込み中...</p>
-        </div>
-      </div>
-    );
-  }
+  if (!user || loading) return <LoadingAnimation />;
 
   return (
-    <>
+    <AdminContentWrapper>
       <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-2">Adminダッシュボード</h1>
         <p className="text-gray-600 text-lg mb-1">ようこそ、{user.displayName}さん</p>
@@ -69,6 +63,6 @@ export default function AdminDashboard() {
           </Link>
         </div>
       </div>
-    </>
+    </AdminContentWrapper>
   );
 }

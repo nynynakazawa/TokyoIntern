@@ -60,6 +60,26 @@ export default function ProfileClient() {
   return (
     <main className="min-h-[60vh] py-8">
       <div className="max-w-4xl mx-auto px-6">
+        {/* 戻るボタン */}
+        <button
+          onClick={() => router.push(`/admin/companies/jobs?companyId=${companyId}`)}
+          className="mb-4 flex items-center text-gray-600 hover:text-gray-800"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5 mr-1"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fillRule="evenodd"
+              d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L4.414 9H17a1 1 0 110 2H4.414l5.293 5.293a1 1 0 010 1.414z"
+              clipRule="evenodd"
+            />
+          </svg>
+          求人一覧に戻る
+        </button>
+
         {/* ヘッダーセクション */}
         <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
           <div className="flex items-center gap-6">

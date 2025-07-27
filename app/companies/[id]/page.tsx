@@ -8,6 +8,7 @@ import { useJobs } from "../../../src/hook/useJobs";
 import JobCard from "../../../components/JobCard";
 import Link from "next/link";
 import { ArrowLeft, MapPin, Phone, Globe, Building } from "lucide-react";
+import LoadingAnimation from "../../../components/LoadingAnimation";
 
 interface Company {
   id: string;
@@ -53,14 +54,7 @@ export default function CompanyDetailPage() {
   }, [companyId]);
 
   if (loading) {
-    return (
-      <div className="min-h-[60vh] flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 border-b-2 border-main-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">読み込み中...</p>
-        </div>
-      </div>
-    );
+    return <LoadingAnimation />;
   }
 
   if (!company) {
@@ -157,10 +151,7 @@ export default function CompanyDetailPage() {
           </div>
 
           {jobsLoading ? (
-            <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-8 border-b-2 border-main-600 mx-auto mb-4"></div>
-              <p className="text-gray-600">求人を読み込み中...</p>
-            </div>
+            <LoadingAnimation />
           ) : jobs.length > 0 ? (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {jobs.map((job) => (

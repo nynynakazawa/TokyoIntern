@@ -7,13 +7,15 @@ import app from "../../../../../../lib/firebaseClient";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { jobSchema, JobFormInput } from "../../../../../../lib/validation/jobSchema";
-import { updateJob } from "../../../../../../lib/serverActions/jobActions";
+import { updateJob, deleteJob } from "../../../../../../lib/serverActions/jobActions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import ImageUpload from "../../../../../../components/ImageUpload";
 import AreaFilter from "../../../../../../components/Filters/AreaFilter";
 import OccupationFilter from "../../../../../../components/Filters/OccupationFilter";
+import { confirmDelete } from "../../../../../../lib/utils/deleteConfirmation";
+import LoadingAnimation from "../../../../../../components/LoadingAnimation";
 
 export default function JobEditPage() {
   const router = useRouter();
@@ -21,6 +23,7 @@ export default function JobEditPage() {
   const [loading, setLoading] = useState(true);
   const [thumbnailUrl, setThumbnailUrl] = useState("");
   const [jobCompanyId, setJobCompanyId] = useState<string>("");
+  const [deleting, setDeleting] = useState(false);
 
   const {
     register,
@@ -56,11 +59,35 @@ export default function JobEditPage() {
     router.push("/company/jobs");
   };
 
-  if (loading) return <div>読み込み中...</div>;
+  const handleDelete = async () => {
+    if (await confirmDelete("この求人を削除しますか？")) {
+      try {
+        setDeleting(true);
+        await deleteJob(id as string);
+        router.push("/company/jobs");
+      } catch (error) {
+        alert("削除中にエラーが発生しました。");
+        console.error(error);
+      } finally {
+        setDeleting(false);
+      }
+    }
+  };
+
+  if (loading) return <LoadingAnimation />;
 
   return (
     <div className="max-w-2xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6">求人編集</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">求人編集</h1>
+        <Button
+          variant="destructive"
+          onClick={handleDelete}
+          disabled={deleting || isSubmitting}
+        >
+          {deleting ? "削除中..." : "求人を削除"}
+        </Button>
+      </div>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div>
           <label className="block font-bold mb-1">タイトル<span className="text-red-500">*</span></label>
@@ -118,9 +145,9 @@ export default function JobEditPage() {
           >
             キャンセル
           </Button>
-          <button type="submit" disabled={isSubmitting} className="btn btn-primary">
+          <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? "送信中..." : "更新"}
-          </button>
+          </Button>
         </div>
       </form>
     </div>
